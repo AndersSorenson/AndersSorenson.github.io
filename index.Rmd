@@ -4,6 +4,9 @@ author: "anders sorenson"
 date: "3/29/2022"
 output: html_document
 ---
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
 
 ```{r}
 library(tidyverse)
@@ -34,19 +37,97 @@ df22$year <- "2022"
 df1822 <- rbind(df18, df19, df20, df21, df22)
 
 df1822$Rk <- NULL
-
+rm('df18', 'df19', 'df20', 'df21', 'df22', 'newdf', 'ep')
 fulldf <- rbind(tidydf, df1822)
 
 
-dfmean <- df1822 %>% 
+
+keeperrows <- !is.na(fulldf$Player)
+fulldf <- fulldf[keeperrows,]
+
+fulldf$MP <- as.numeric(as.character(fulldf$MP))
+fulldf$year <- as.numeric(as.character(fulldf$year))
+i <- c(8,9, 11, 12, 14, 15, 18, 19, 21 , 22, 23, 24, 25, 26, 27 ,28 , 29)
+fulldf[ , i] <- apply(fulldf[ , i], 2,
+                      function(x) as.numeric(as.character(x)))
+```
+We are going to be looking at seasons after the introduction of the three-point line in 1980 and at players who played at least half of the games in each season and averaged at least 8 minutes per game.
+```{r}
+elplayers <- subset(fulldf, fulldf$year>=1980 & fulldf$G>=41 & fulldf$MP>=8)
+elplayers <- elplayers[!grepl("-", elplayers$Pos),]
+threes <- elplayers[!is.na(elplayers$`3P%`),]
+
+threes <- threes %>% 
   group_by(Pos, year) %>% 
-  mutate(PTS = mean(PTS), TRB = mean(TRB), ORB = mean(ORB))
-
-dfmean %>% 
-  ggplot(aes(x=year, y=PTS, color=Pos)) + 
-  geom_line()
+  mutate(`3P%` = mean(`3P%`), FGA = mean(FGA), `3PA` = mean(`3PA`), `3P` = mean(`3P`), FG = mean(FG), G = mean(G))
 
 
+posaverages <- elplayers %>% 
+  group_by(Pos, year) %>% 
+  mutate(PTS = mean(PTS), TRB = mean(TRB), ORB = mean(ORB), FGA = mean(FGA), FG = mean(FG), `2PA` = mean(`2PA`), `2P` = mean(`2P`), DRB = mean(DRB), FT = mean(FT), FTA = mean(FTA), AST = mean(AST), BLK = mean(BLK), STL = mean(STL), TOV = mean(TOV),
+         PF = mean(PF), `3PA` = mean(`3PA`), `3P` = mean(`3PA`), `FG%` = mean(`FG%`), `eFG%` = mean(`eFG%`), G = mean(G)
+         )
+threes <- threes %>% mutate(amt_threes_attempted = `3PA` / FGA)
+threes <- threes %>% mutate(amt_threes_made = `3P` / FG)
+
+threes <- threes %>%
+  group_by(year) %>% mutate(`avg_3PA_total`= sum(`3PA`))
+ 
+
+
+
+
+```
+To start off, let's look at  how rebounding, a skill typically most associated with Centers and Power Forwards and see how this has chnaged over time.
+```{r}
+posaverages %>% 
+  ggplot(aes(x=year, y= DRB, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Average # of Defensive Rebounds per Game 1980-2022 by Position", x='Year', y= "Average Defensive Rebounds Per Game")
+
+posaverages %>% 
+  ggplot(aes(x=year, y= ORB, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Average # of Offensive Rebounds per Game 1980-2022 by Position", x='Year', y= "Average Offensive Rebounds Per Game")
+
+posaverages %>% 
+  ggplot(aes(x=year, y= TRB, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Average # of Total Rebounds per Game 1980-2022 by Position", x='Year', y= "Average Total Rebounds Per Game")
+```
+Assist are skill most associated with back court positions, Point Guard and Shooting Guard.
+```{r}
+posaverages %>% 
+  ggplot(aes(x=year, y= AST, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Average # of Assiists per Game 1980-2022 by Position", x='Year', y= "Average Assists Per Game")
+
+```
+
+Now lets look at how each position has evolved in regards to three point shooting over the years.
+
+```{r}
+
+threes %>% 
+  ggplot(aes(x=year, y=`3P%`, color=Pos)) + 
+  geom_line() + 
+  labs(title = "Average Three-Point Percentage 1980-2022 by Position", x='Year', y= "Three Point Percentage")
+
+threes %>% 
+  ggplot(aes(x=year, y=`3PA`, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Average Amount of Three-Point Field Goals Attempted 1980-2022 by Position", x='Year', y= "Average number of Three Point Attempts Per Game")
+
+
+threes %>% 
+  ggplot(aes(x=year, y=amt_threes_made, color=Pos)) + 
+  geom_line() + 
+  labs(x='Year', y= "Ratio of Made Threes to Total Made Field Goals")
+ 
+threes %>% 
+  ggplot(aes(x=year, y=amt_threes_attempted, color=Pos)) + 
+  geom_line() + 
+  labs(x='Year', y= "Ratio of Attempted Threes to Total Attempted Field Goals")
 
 
 ```
