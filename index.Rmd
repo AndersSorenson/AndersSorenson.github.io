@@ -2,16 +2,21 @@
 title: "index"
 author: "anders sorenson"
 date: "3/29/2022"
-output: html_document
+output: 
+  prettydoc::html_pretty:
+    theme: cayman
 ---
 ```{r setup, include=FALSE} 
-knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+bodystyle="background-color:grey;"
 ```
 
 ```{r}
 library(tidyverse)
 library(ggplot2)
 library(readxl)
+library(rmarkdown)
+library(prettydoc)
 knitr::opts_chunk$set(echo = TRUE)
 
 df <- read_csv("50_17 - Seasons_Stats.csv")
@@ -20,13 +25,19 @@ df19 <- read_csv("2018_2019 - Sheet1.csv")
 df20 <- read_csv("2019_2020 - Sheet1.csv")
 df21 <- read_csv("2020_2021 - Sheet1.csv")
 df22 <- read_csv("2021-2022 - Sheet1.csv")
+totals22 <- read_csv("21 - 22 totals - Sheet1.csv")
+totals21 <- read_csv("20 - 21 totals - Sheet1.csv")
+totals20 <- read_csv("2019-2020 Totals - Sheet1.csv")
+totals19 <- read_csv("2018-2019 totals - Sheet1.csv")
+totals18 <- read_csv("2017-2018 totals - Sheet1.csv")
+
 
 tidydf <- df %>%
   select(c("Player", "Pos", "Age",    "Tm", "G", "GS", "MP", "FG", "FGA", "FG%", "3P", "3PA", "3P%", "2P", "2PA", "2P%", "eFG%", "FT", "FTA", "FT%", "ORB", "DRB", "TRB", "AST", "STL", "BLK", "TOV", "PF", "PTS", "Year"))
 
+
+
 names(tidydf)[names(tidydf) == 'Year'] <- 'year'
-
-
 
 df18$year <- "2018"
 df19$year <- "2019"
@@ -34,10 +45,12 @@ df20$year <- "2020"
 df21$year <- "2021"
 df22$year <- "2022"
 
+
+
 df1822 <- rbind(df18, df19, df20, df21, df22)
 
+
 df1822$Rk <- NULL
-rm('df18', 'df19', 'df20', 'df21', 'df22', 'newdf', 'ep')
 fulldf <- rbind(tidydf, df1822)
 
 
@@ -50,6 +63,44 @@ fulldf$year <- as.numeric(as.character(fulldf$year))
 i <- c(8,9, 11, 12, 14, 15, 18, 19, 21 , 22, 23, 24, 25, 26, 27 ,28 , 29)
 fulldf[ , i] <- apply(fulldf[ , i], 2,
                       function(x) as.numeric(as.character(x)))
+
+
+#totals 2018-2022
+totals18$year <- "2018"
+totals19$year <- "2019"
+totals20$year <- "2020"
+totals21$year <- "2021"
+totals22$year <- "2022"
+
+totals1822 <- rbind(totals18, totals19, totals20, totals21, totals22)
+totals1822$Rk = NULL
+#total 2017-1950
+totals5017 <- df %>%
+  select(c("Player", "Pos", "Age",    "Tm", "G", "GS", "TMP", "TFG", "TFGA", "FG%", "T3P", "T3PA", "3P%", "T2P", "T2PA", "2P%", "eFG%", "TFT", "TFTA", "FT%", "TORB", "TDRB", "TTRB", "TAST", "TSTL", "TBLK", "TTOV", "TPF", "TPTS", "Year"))
+
+#renaming variables
+oldnames = c("TMP", "TFG", "TFGA", "T3P", "T3PA", "T2P", "T2PA", "TFT", "TFTA", "TORB", "TDRB", "TTRB", "TAST", "TSTL", "TBLK", "TTOV", "TPF", "TPTS", "Year")
+newnames = c("MP", "FG", "FGA",    "3P", "3PA", "2P", "2PA", "FT", "FTA", "ORB", "DRB", "TRB", "AST", "STL", "BLK",    "TOV", "PF", "PTS", "year")
+totals5017 <- totals5017 %>% rename_with(~ newnames, all_of(oldnames)) 
+
+# combining both 'totals' data frames
+fulltotals <- rbind(totals5017, totals1822)
+# more cleaning---------------------------------------------------------------------------------------------------------------##
+keeperrows <- !is.na(fulltotals$Player)
+fulltotals <- fulltotals[keeperrows,]
+fulltotals <- subset(fulltotals, fulltotals$year>=1980)
+fulltotals <- fulltotals[!grepl("-", fulltotals$Pos),]
+
+fulltotals <-  fulltotals %>% group_by(year) %>% mutate(league_TRB = sum(TRB), league_pts = sum(PTS), league_ORB = sum(ORB), league_FGA = sum(FGA), league_FG = sum(FG), `league_2PA` = sum(`2PA`), `league_2P` = sum(`2P`), league_DRB = sum(DRB), league_FT = sum(FT), league_FTA = sum(FTA), league_AST = sum(AST), league_BLK = sum(BLK), league_STL = sum(STL), league_TOV = sum(TOV),
+         league_PF = sum(PF), `league_3PA` = sum(`3PA`), `league_3P` = sum(`3P`))
+
+fulltotals <-  fulltotals %>% group_by(Pos, year) %>% mutate(Pos_TRB = sum(TRB), Pos_pts = sum(PTS), Pos_ORB = sum(ORB), Pos_FGA = sum(FGA), Pos_FG = sum(FG), `Pos_2PA` = sum(`2PA`), `Pos_2P` = sum(`2P`), Pos_DRB = sum(DRB), Pos_FT = sum(FT), Pos_FTA = sum(FTA), Pos_AST = sum(AST), Pos_BLK = sum(BLK), Pos_STL = sum(STL), Pos_TOV = sum(TOV),
+         Pos_PF = sum(PF), `Pos_3PA` = sum(`3PA`), `Pos_3P` = sum(`3PA`))
+fulltotals <- fulltotals %>% mutate(fTRB=Pos_TRB / league_TRB, fpts = Pos_pts/ league_pts, fORB = Pos_ORB / league_ORB, 
+f2PA = Pos_2PA/league_2PA, f2P= Pos_2P/league_2P, fDRB= Pos_DRB/league_DRB, fAST = Pos_AST/league_AST, 
+fBLK=Pos_BLK/league_BLK, fSTL= Pos_STL/league_STL, f3PA = Pos_3PA/league_3PA, f3P = Pos_3P/league_3P, fPF = Pos_PF/league_PF)
+
+fulltotals$year <- as.numeric(as.character(fulltotals$year))
 ```
 We are going to be looking at seasons after the introduction of the three-point line in 1980 and at players who played at least half of the games in each season and averaged at least 8 minutes per game.
 ```{r}
@@ -70,15 +121,17 @@ posaverages <- elplayers %>%
 threes <- threes %>% mutate(amt_threes_attempted = `3PA` / FGA)
 threes <- threes %>% mutate(amt_threes_made = `3P` / FG)
 
-threes <- threes %>%
-  group_by(year) %>% mutate(`avg_3PA_total`= sum(`3PA`))
- 
+#testing
+testing <- df1822 %>% group_by(Pos, year) %>% mutate(`3PA` = mean(`3PA`))
+testing <- testing %>%
+  group_by(year) %>% mutate(`avg_3PA_total`= sum(unique(`3PA`)))
+df1822totals <- df1822 %>% mutate(`T3P` = `3P` * G, `T3PA` = `3PA` * G)
 
 
 
 
 ```
-To start off, let's look at  how rebounding, a skill typically most associated with Centers and Power Forwards and see how this has chnaged over time.
+To start off, let's look at  how rebounding, a skill typically most associated with Centers and Power Forwards and see how this has changed over time.
 ```{r}
 posaverages %>% 
   ggplot(aes(x=year, y= DRB, color=Pos)) + 
@@ -94,6 +147,24 @@ posaverages %>%
   ggplot(aes(x=year, y= TRB, color=Pos)) + 
   geom_line(size=1) + 
   labs(title = "Average # of Total Rebounds per Game 1980-2022 by Position", x='Year', y= "Average Total Rebounds Per Game")
+
+fulltotals %>% 
+  ggplot(aes(x=year, y=`fTRB`, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Percentage of Total Rebounds by Position 1980-2022", x='Year', y= "Percentage of total Rebounds")
+
+fulltotals %>% 
+  ggplot(aes(x=year, y=`fORB`, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Percentage of Total Offensive Rebounds by Position 1980-2022", x='Year', y= "Percentage of total Offensive Rebounds")
+
+fulltotals %>% 
+  ggplot(aes(x=year, y=`fDRB`, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Percentage of Total Defensive Rebounds by Position 1980-2022", x='Year', y= "Percentage of Total Defensive Rebounds")
+
+
+
 ```
 Assist are skill most associated with back court positions, Point Guard and Shooting Guard.
 ```{r}
@@ -101,6 +172,12 @@ posaverages %>%
   ggplot(aes(x=year, y= AST, color=Pos)) + 
   geom_line(size=1) + 
   labs(title = "Average # of Assiists per Game 1980-2022 by Position", x='Year', y= "Average Assists Per Game")
+
+fulltotals %>% 
+  ggplot(aes(x=year, y=`fAST`, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Percentage of Total Assists by Position 1980-2022", x='Year', y= "Percentage of total Assists")
+
 
 ```
 
@@ -129,6 +206,74 @@ threes %>%
   geom_line() + 
   labs(x='Year', y= "Ratio of Attempted Threes to Total Attempted Field Goals")
 
+fulltotals %>% 
+  ggplot(aes(x=year, y=`f3PA`, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Percentage of Total 3 Point Attempts Taken by Each Position 1980-2022", x='Year', y= "Percentage of total 3 Point attempts")
+
+fulltotals %>% 
+  ggplot(aes(x=year, y=`f3P`, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Percentage of Total 3 Pointers by Each Position 1980-2022", x='Year', y= "Percentage of total 3 Pointers")
+
+
+```
+```{r}
+fulltotals %>% 
+  ggplot(aes(x=year, y= fBLK, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Percentage of Total Blocks by Position 1980-2022", x='Year', y= "Percentage of total Blocks")
+
+posaverages %>% 
+  ggplot(aes(x=year, y= BLK, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Average # of Blocks Per game by Position 1980-2022", x='Year', y= "Average Blocks Per Game")
+
+```
+Fouls
+```{r}
+posaverages %>% 
+  ggplot(aes(x=year, y= PF, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Average # of Personal Fouls per Game 1980-2022 by Position", x='Year', y= "Average Personal Fouls Per Game")
+
+fulltotals %>% 
+  ggplot(aes(x=year, y=`f3P`, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Percentage of Total Personal Fouls by Each Position 1980-2022", x='Year', y= "Percentage of Total Personal Fouls")
 
 ```
 
+```{r}
+fulltotals %>% 
+  ggplot(aes(x=year, y=`f2P`, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Percentage of Total 2-Point Field Goals by Each Position 1980-2022", x='Year', y= "Percentage of total 2 Pointers")
+
+
+fulltotals %>% 
+  ggplot(aes(x=year, y=`f2PA`, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Percentage of Total 2-Point Field Goal Attempts by Each Position 1980-2022", x='Year', y= "Percentage of total 2 Pointers")
+
+
+posaverages %>% 
+  ggplot(aes(x=year, y= `2P`, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Average # of 2-Point Field Goals per Game 1980-2022 by Position", x='Year', y= "Average 2-Point Field Goals Fouls Per Game")
+
+posaverages %>% 
+  ggplot(aes(x=year, y= `2PA`, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Average # of 2-Point Field Goal Attempts per Game 1980-2022 by Position", x='Year', y= "Average 2-Point Field Goal Attempts Per Game")
+
+
+```
+
+```{r}
+
+posaverages %>% 
+  ggplot(aes(x=year, y= `FG%`, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Average Field Goal Percentage by Position 1980-2022", x='Year', y= "Field Goal Percentage")
+```
