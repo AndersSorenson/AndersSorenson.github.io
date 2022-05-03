@@ -1,6 +1,6 @@
 ---
 title: "Positionless NBA"
-author: "Anders sorenson"
+author: "Anders Sorenson"
 date: "3/29/2022"
 output: 
   prettydoc::html_pretty:
@@ -11,15 +11,16 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 bodystyle="background-color:grey;"
 ```
 # Introduction
-If you've watched the NBA in last few years you've probably heard something about how the NBA is becoming "positionless league". The way that basketball is traditionally played the different positions (point guard, shooting guard, small forward, power forward, and center) have clearly defined roles and skillsets. However, some would argue that the NBA has now evolved into a league where every position does a little bit of everything, including certain jobs that are traditionally performed by other positions, hence the term "positionless league". For my final project I wanted to see if this was true and that if the claims of the NBA becoming positionless could be backed up with statistics. If the NBA is truly becoming positionless we should be able to observe the recorded statistics for each player start to coalesce.
+If you've watched the NBA in last few years you've probably heard something about how the NBA is becoming "positionless league". Traditionally basketball is played with clearly defined roles and skillsets for each position (point guard, shooting guard, small forward, power forward, and center). However, many argue that the NBA has now evolved into a league where every position does a little bit of everything, including certain jobs that are traditionally performed by other positions, hence the term "positionless league". For my final project I used box score data from 1980 to 2022 to examine if the claims that the NBA is becoming positionless could be shown through these data. If the NBA is truly becoming positionless we should be able to observe the recorded statistics for each position start to converge.
 
-All the data used int his project comes from basketballreference.com. This project uses dat from 1980 onward as this was the year the three point line was introduced to the NBA which had a large effect on the way each position plays the game. For any statistics in which the positional average was taken, only player who played in at least 41 games and played at least 8 minutes per game were considered.
+All the data used in this project comes from basketballreference.com which reports player statistics for points per game, rebounds per game, etc. In 1980 the NBA introduced the 3-point line which had a significant impact on the way each position plays the game, for this reason I choose to only use data from 1980 onward. For any statistics in which the positional average was taken, only player who played in at least 41 games and played at least 8 minutes per game were considered. I also excluded players who changed position during a season because these players statistics would naturally skew towards being positionless.
 ```{r, echo=FALSE}
 library(tidyverse)
 library(ggplot2)
 library(readxl)
 library(rmarkdown)
 library(prettydoc)
+library(modelr)
 knitr::opts_chunk$set(echo = TRUE)
 
 df <- read_csv("50_17 - Seasons_Stats.csv")
@@ -132,7 +133,7 @@ df1822totals <- df1822 %>% mutate(`T3P` = `3P` * G, `T3PA` = `3PA` * G)
 
 ```
 # Rebounding
-To start off, let's look at  how rebounding -- a skill typically most associated with Centers and Power Forward -- and how this has changed over time.
+To start off, let's look at  how rebounding -- a skill typically most associated with Centers and Power Forward -- has changed over time.
 
 ```{r, echo=FALSE, figures-side, fig.show="hold", out.width="50%"}
 posaverages %>% 
@@ -166,7 +167,8 @@ fulltotals %>%
   labs(title = "Percentage of Total Rebounds by Position 1980-2022", x='Year', y= "Percentage of total Rebounds")
 
 ```
-Interestingly, you can see in this set of graphs that the efensive rebounds
+Interestingly, you can see in this set of graphs that the positions which are not typically associated with rebounding have increased their amount of defensive rebounds grabbed but have remained fairly stable when it comes to offensive rebounding. Power forwards offensive rebounding numbers have greatly decreased as center numbers increased in recent years.
+
 # Assists
 Assist are skill traditionally associated with back court positions, Point Guard and Shooting Guard. Let's see if assists have become more evenly distributed by position.
 
@@ -183,6 +185,7 @@ fulltotals %>%
 
 
 ```
+Assist numbers remain fairly constant for both guard positions and small forward. However, assist numbers for center and power forward have seen an uptick recently.
 
 # Three Point Shooting
 Now lets look at how each position has evolved in regards to three point shooting over the years.
@@ -202,18 +205,18 @@ threes %>%
 threes %>% 
   ggplot(aes(x=year, y=amt_threes_made, color=Pos)) + 
   geom_line() + 
-  labs(title= 'Percentage of Made Field Goals Which Were Three Pointers', x='Year', y= "Ratio of Made Threes to Total Made Field Goals")
+  labs(title= 'Percentage of Made Field Goals Which Were Three Pointers by position 1980-2022', x='Year', y= "Ratio of Made Threes to Total Made Field Goals")
 
 fulltotals %>% 
   ggplot(aes(x=year, y=`f3P`, color=Pos)) + 
   geom_line(size=1) + 
-  labs(title = "Percentage of Total 3 Pointers by Each Position 1980-2022", x='Year', y= "Percentage of total 3 Pointers")
+  labs(title = "Percentage of Total 3 Pointers Made by Each Position 1980-2022", x='Year', y= "Percentage of total 3 Pointers")
 
 ```
-Explanation
+Three point percentage has greatly increased for every position since it's addition in 1980. This statistic also shows some of the most positional change over the years, centers have increased their portion of made 3-pointers and Power forwards have almost closed the shooting gap between them and the backcourt positions.
 
 # Blocks
-Let`s take a look at blocks now...
+Let's take a look at blocks now...
 
 ```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 fulltotals %>% 
@@ -227,6 +230,7 @@ posaverages %>%
   labs(title = "Average # of Blocks Per game by Position 1980-2022", x='Year', y= "Average Blocks Per Game")
 
 ```
+Blocks seem to have remained the most constant statistic throughout the years, although the last decade has seen an uptick in blocks by shooting guards and point guards.
 
 ## Personal Fouls
 These plots demonstrate which positions account for the most fouls and how that may have changed over the years
@@ -238,14 +242,15 @@ posaverages %>%
   labs(title = "Average # of Personal Fouls per Game 1980-2022 by Position", x='Year', y= "Average Personal Fouls Per Game")
 
 fulltotals %>% 
-  ggplot(aes(x=year, y=`f3P`, color=Pos)) + 
+  ggplot(aes(x=year, y=`fPF`, color=Pos)) + 
   geom_line(size=1) + 
   labs(title = "Percentage of Total Personal Fouls by Each Position 1980-2022", x='Year', y= "Percentage of Total Personal Fouls")
 
 ```
 
+
 # Two Point Shooting
-Since we've already looked at Threes lets take a look at two's as well.
+Since we've already looked at three pointers lets take a look at twos as well.
 
 ```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 #possibly change scale
@@ -260,11 +265,7 @@ posaverages %>%
   labs(title = "Average # of 2-Point Field Goals per Game 1980-2022 by Position", x='Year', y= "Average 2-Point Field Goals Per Game")
 
 ```
+Unsurprisingly, the number of two-point field goals has decreased as the popularity of the three-point shot has risen. The proportion of total two-pointers being made by each position seems to be in a state of constant fluctuation.
 
-```{r, echo=FALSE}
-
-posaverages %>% 
-  ggplot(aes(x=year, y= `FG%`, color=Pos)) + 
-  geom_line(size=1) + 
-  labs(title = "Average Field Goal Percentage by Position 1980-2022", x='Year', y= "Field Goal Percentage")
-```
+# Conclusion
+The claim that the NBA is becoming a more and more positionless league can be supported by these data depending in most cases. It seems to early to say that the NBA is already a positionless league but it does seem to be heading more in that direction as players continue to pick up skills that are not traditionally associated with their position. In the case of some statistics like assists and rebounds, there are still certain position groups which dominate the statistic, Point Guards and Centers respectively, however we can see a clear increase in the other non-associated positions numbers in both of these categories. Shooting is where the convergence of positions is most evident, in the mid 90's there is a distinct gap in three point shooting between Power Forward and Center and the rest of the positions. Now in 2022 the gap between Center and the other positions has gotten much smaller and the gap between power forward and the other positions is almost non-existent. This shows that NBA players are becoming more comfortable playing out of their positions traditional roles as the NBA becomes more positionless.
