@@ -130,22 +130,30 @@ testing <- testing %>%
   group_by(year) %>% mutate(`avg_3PA_total`= sum(unique(`3PA`)))
 df1822totals <- df1822 %>% mutate(`T3P` = `3P` * G, `T3PA` = `3PA` * G)
 
-
-
-
 ```
 # Rebounding
-To start off, let's look at  how rebounding, a skill typically most associated with Centers and Power Forwards and see how this has changed over time. For all of the
-```{r, echo=FALSE}
+To start off, let's look at  how rebounding -- a skill typically most associated with Centers and Power Forward -- and see how this has changed over time.
+
+```{r, echo=FALSE, figures-side, fig.show="hold", out.width="50%"}
 posaverages %>% 
   ggplot(aes(x=year, y= DRB, color=Pos)) + 
   geom_line(size=1) + 
-  labs(title = "Average # of Defensive Rebounds per Game 1980-2022 by Position", x='Year', y= "Average Defensive Rebounds Per Game")
+  labs(title = "Average # Defensive Rebounds per Game by Position 1980-2022", x='Year', y= "Average Defensive Rebounds Per Game")
+
+fulltotals %>% 
+  ggplot(aes(x=year, y=`fDRB`, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Percentage of Total Defensive Rebounds by Position 1980-2022", x='Year', y= "Percentage of Total Defensive Rebounds")
 
 posaverages %>% 
   ggplot(aes(x=year, y= ORB, color=Pos)) + 
   geom_line(size=1) + 
   labs(title = "Average # of Offensive Rebounds per Game 1980-2022 by Position", x='Year', y= "Average Offensive Rebounds Per Game")
+
+fulltotals %>% 
+  ggplot(aes(x=year, y=`fORB`, color=Pos)) + 
+  geom_line(size=1) + 
+  labs(title = "Percentage of Total Offensive Rebounds by Position 1980-2022", x='Year', y= "Percentage of total Offensive Rebounds")
 
 posaverages %>% 
   ggplot(aes(x=year, y= TRB, color=Pos)) + 
@@ -157,27 +165,16 @@ fulltotals %>%
   geom_line(size=1) + 
   labs(title = "Percentage of Total Rebounds by Position 1980-2022", x='Year', y= "Percentage of total Rebounds")
 
-fulltotals %>% 
-  ggplot(aes(x=year, y=`fORB`, color=Pos)) + 
-  geom_line(size=1) + 
-  labs(title = "Percentage of Total Offensive Rebounds by Position 1980-2022", x='Year', y= "Percentage of total Offensive Rebounds")
-
-fulltotals %>% 
-  ggplot(aes(x=year, y=`fDRB`, color=Pos)) + 
-  geom_line(size=1) + 
-  labs(title = "Percentage of Total Defensive Rebounds by Position 1980-2022", x='Year', y= "Percentage of Total Defensive Rebounds")
-
-
-
 ```
 
 # Assists
 Assist are skill traditionally associated with back court positions, Point Guard and Shooting Guard. Let's see if assists have become more evenly distributed by position.
-```{r, echo=FALSE}
+
+```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 posaverages %>% 
   ggplot(aes(x=year, y= AST, color=Pos)) + 
   geom_line(size=1) + 
-  labs(title = "Average # of Assiists per Game 1980-2022 by Position", x='Year', y= "Average Assists Per Game")
+  labs(title = "Average # of Assists per Game 1980-2022 by Position", x='Year', y= "Average Assists Per Game")
 
 fulltotals %>% 
   ggplot(aes(x=year, y=`fAST`, color=Pos)) + 
@@ -189,7 +186,8 @@ fulltotals %>%
 
 # Three Point Shooting
 Now lets look at how each position has evolved in regards to three point shooting over the years.
-```{r, echo=FALSE}
+
+```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 
 threes %>% 
   ggplot(aes(x=year, y=`3P%`, color=Pos)) + 
@@ -226,7 +224,9 @@ fulltotals %>%
 ```
 
 # Blocks
-```{r, echo=FALSE}
+Let`s take a look at blocks now...
+
+```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 fulltotals %>% 
   ggplot(aes(x=year, y= fBLK, color=Pos)) + 
   geom_line(size=1) + 
@@ -241,7 +241,8 @@ posaverages %>%
 
 ## Personal Fouls
 These plots demonstrate which positions account for the most fouls and how that may have changed over the years
-```{r, echo=FALSE}
+
+```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 posaverages %>% 
   ggplot(aes(x=year, y= PF, color=Pos)) + 
   geom_line(size=1) + 
@@ -256,7 +257,8 @@ fulltotals %>%
 
 # Two Point Shooting
 Since we've already looked at Threes lets take a look at two's as well.
-```{r, echo=FALSE}
+
+```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 fulltotals %>% 
   ggplot(aes(x=year, y=`f2P`, color=Pos)) + 
   geom_line(size=1) + 
