@@ -10,7 +10,7 @@ output:
 knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 bodystyle="background-color:grey;"
 ```
-# Introdution
+# Introduction
 If you've watched the NBA in last few years you've probably heard something about how the NBA is becoming "positionless league". The way that basketball is traditionally played the different positions (point guard, shooting guard, small forward, power forward, and center) have clearly defined roles and skillsets. However, some would argue that the NBA has now evolved into a league where every position does a little bit of everything, including certain jobs that are traditionally performed by other positions, hence the term "positionless league". For my final project I wanted to see if this was true and that if the claims of the NBA becoming positionless could be backed up with statistics. 
 
 All the data used int his project comes from basketballreference.com. This project uses dat from 1980 onward as this was the year the three point line was introduced to the NBA which had a large effect on the way each position plays the game. For any statistics in which the positional average was taken, only player who played in at least 41 games and played at least 8 minutes per game were considered.
@@ -105,8 +105,8 @@ fBLK=Pos_BLK/league_BLK, fSTL= Pos_STL/league_STL, f3PA = Pos_3PA/league_3PA, f3
 
 fulltotals$year <- as.numeric(as.character(fulltotals$year))
 ```
-We are going to be looking at seasons after the introduction of the three-point line in 1980 and at players who played at least half of the games in each season and averaged at least 8 minutes per game.
-```{r}
+
+```{r, echo=FALSE}
 elplayers <- subset(fulldf, fulldf$year>=1980 & fulldf$G>=41 & fulldf$MP>=8)
 elplayers <- elplayers[!grepl("-", elplayers$Pos),]
 threes <- elplayers[!is.na(elplayers$`3P%`),]
@@ -134,7 +134,7 @@ df1822totals <- df1822 %>% mutate(`T3P` = `3P` * G, `T3PA` = `3PA` * G)
 
 
 ```
-#Rebounding
+# Rebounding
 To start off, let's look at  how rebounding, a skill typically most associated with Centers and Power Forwards and see how this has changed over time. For all of the
 ```{r, echo=FALSE}
 posaverages %>% 
@@ -170,7 +170,8 @@ fulltotals %>%
 
 
 ```
-## Assists
+
+# Assists
 Assist are skill traditionally associated with back court positions, Point Guard and Shooting Guard. Let's see if assists have become more evenly distributed by position.
 ```{r, echo=FALSE}
 posaverages %>% 
@@ -185,7 +186,8 @@ fulltotals %>%
 
 
 ```
-### Three Point Shooting
+
+# Three Point Shooting
 Now lets look at how each position has evolved in regards to three point shooting over the years.
 ```{r, echo=FALSE}
 
@@ -222,6 +224,8 @@ fulltotals %>%
 
 
 ```
+
+# Blocks
 ```{r, echo=FALSE}
 fulltotals %>% 
   ggplot(aes(x=year, y= fBLK, color=Pos)) + 
@@ -234,7 +238,8 @@ posaverages %>%
   labs(title = "Average # of Blocks Per game by Position 1980-2022", x='Year', y= "Average Blocks Per Game")
 
 ```
-#### Fouls
+
+## Personal Fouls
 These plots demonstrate which positions account for the most fouls and how that may have changed over the years
 ```{r, echo=FALSE}
 posaverages %>% 
@@ -248,8 +253,9 @@ fulltotals %>%
   labs(title = "Percentage of Total Personal Fouls by Each Position 1980-2022", x='Year', y= "Percentage of Total Personal Fouls")
 
 ```
-##### Two Point Shooting
-since we've already looked at Threes lets take a look at two's as well.
+
+# Two Point Shooting
+Since we've already looked at Threes lets take a look at two's as well.
 ```{r, echo=FALSE}
 fulltotals %>% 
   ggplot(aes(x=year, y=`f2P`, color=Pos)) + 
