@@ -170,7 +170,7 @@ fulltotals %>%
 Interestingly, you can see in this set of graphs that the positions which are not typically associated with rebounding have increased their amount of defensive rebounds grabbed but have remained fairly stable when it comes to offensive rebounding. Power forwards offensive rebounding numbers have greatly decreased as center numbers increased in recent years.
 
 # Assists
-Assist are skill traditionally associated with back court positions, Point Guard and Shooting Guard. Let's see if assists have become more evenly distributed by position.
+Assists are a skill traditionally associated with back court positions, Point Guard and Shooting Guard. Let's see if assists have become more evenly distributed by position.
 
 ```{r, echo=FALSE, fig.show="hold", out.width="50%"}
 posaverages %>% 
@@ -205,7 +205,7 @@ threes %>%
 threes %>% 
   ggplot(aes(x=year, y=amt_threes_made, color=Pos)) + 
   geom_line() + 
-  labs(title= 'Percentage of Made Field Goals Which Were Three Pointers by position 1980-2022', x='Year', y= "Ratio of Made Threes to Total Made Field Goals")
+  labs(title= 'Percentage of Made Field Goals Which Were Three Pointers by Position', x='Year', y= "Ratio of Made Threes to Total Made Field Goals")
 
 fulltotals %>% 
   ggplot(aes(x=year, y=`f3P`, color=Pos)) + 
@@ -247,7 +247,7 @@ fulltotals %>%
   labs(title = "Percentage of Total Personal Fouls by Each Position 1980-2022", x='Year', y= "Percentage of Total Personal Fouls")
 
 ```
-
+The amount of personal fouls seems to have decreased over the years but the positional relationships have remained fairly constant.
 
 # Two Point Shooting
 Since we've already looked at three pointers lets take a look at twos as well.
@@ -268,4 +268,6 @@ posaverages %>%
 Unsurprisingly, the number of two-point field goals has decreased as the popularity of the three-point shot has risen. The proportion of total two-pointers being made by each position seems to be in a state of constant fluctuation.
 
 # Conclusion
-The claim that the NBA is becoming a more and more positionless league can be supported by these data depending in most cases. It seems to early to say that the NBA is already a positionless league but it does seem to be heading more in that direction as players continue to pick up skills that are not traditionally associated with their position. In the case of some statistics like assists and rebounds, there are still certain position groups which dominate the statistic, Point Guards and Centers respectively, however we can see a clear increase in the other non-associated positions numbers in both of these categories. Shooting is where the convergence of positions is most evident, in the mid 90's there is a distinct gap in three point shooting between Power Forward and Center and the rest of the positions. Now in 2022 the gap between Center and the other positions has gotten much smaller and the gap between power forward and the other positions is almost non-existent. This shows that NBA players are becoming more comfortable playing out of their positions traditional roles as the NBA becomes more positionless.
+The claim that the NBA is becoming a more and more positionless league can be supported by this data. It seems to early to say that the NBA is already a positionless league but it does seem to be heading more in that direction as players continue to pick up skills that are not traditionally associated with their position. In the case of some statistics like assists and rebounds, there are still certain position groups which dominate the statistic, Point Guards and Centers respectively, however we can see a clear increase in the other non-associated positions numbers in both of these categories. Shooting is where the convergence of positions is most evident, in the mid 90's there is a distinct gap in three point shooting between Power Forward and Center and the rest of the positions. Now in 2022 the gap between Center and the other positions has gotten much smaller and the gap between power forward and the other positions is almost non-existent. This shows that NBA players are becoming more comfortable playing out of their positions traditional roles as the NBA becomes more positionless.
+
+[Code and Data](https://github.com/AndersSorenson/AndersSorenson.github.io.git)
