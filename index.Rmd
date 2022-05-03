@@ -11,7 +11,7 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 bodystyle="background-color:grey;"
 ```
 # Introduction
-If you've watched the NBA in last few years you've probably heard something about how the NBA is becoming "positionless league". The way that basketball is traditionally played the different positions (point guard, shooting guard, small forward, power forward, and center) have clearly defined roles and skillsets. However, some would argue that the NBA has now evolved into a league where every position does a little bit of everything, including certain jobs that are traditionally performed by other positions, hence the term "positionless league". For my final project I wanted to see if this was true and that if the claims of the NBA becoming positionless could be backed up with statistics. 
+If you've watched the NBA in last few years you've probably heard something about how the NBA is becoming "positionless league". The way that basketball is traditionally played the different positions (point guard, shooting guard, small forward, power forward, and center) have clearly defined roles and skillsets. However, some would argue that the NBA has now evolved into a league where every position does a little bit of everything, including certain jobs that are traditionally performed by other positions, hence the term "positionless league". For my final project I wanted to see if this was true and that if the claims of the NBA becoming positionless could be backed up with statistics. If the NBA is truly becoming positionless we should be able to observe the recorded statistics for each player start to coalesce.
 
 All the data used int his project comes from basketballreference.com. This project uses dat from 1980 onward as this was the year the three point line was introduced to the NBA which had a large effect on the way each position plays the game. For any statistics in which the positional average was taken, only player who played in at least 41 games and played at least 8 minutes per game were considered.
 ```{r, echo=FALSE}
@@ -98,7 +98,7 @@ fulltotals <-  fulltotals %>% group_by(year) %>% mutate(league_TRB = sum(TRB), l
          league_PF = sum(PF), `league_3PA` = sum(`3PA`), `league_3P` = sum(`3P`))
 
 fulltotals <-  fulltotals %>% group_by(Pos, year) %>% mutate(Pos_TRB = sum(TRB), Pos_pts = sum(PTS), Pos_ORB = sum(ORB), Pos_FGA = sum(FGA), Pos_FG = sum(FG), `Pos_2PA` = sum(`2PA`), `Pos_2P` = sum(`2P`), Pos_DRB = sum(DRB), Pos_FT = sum(FT), Pos_FTA = sum(FTA), Pos_AST = sum(AST), Pos_BLK = sum(BLK), Pos_STL = sum(STL), Pos_TOV = sum(TOV),
-         Pos_PF = sum(PF), `Pos_3PA` = sum(`3PA`), `Pos_3P` = sum(`3PA`))
+         Pos_PF = sum(PF), `Pos_3PA` = sum(`3PA`), `Pos_3P` = sum(`3P`))
 fulltotals <- fulltotals %>% mutate(fTRB=Pos_TRB / league_TRB, fpts = Pos_pts/ league_pts, fORB = Pos_ORB / league_ORB, 
 f2PA = Pos_2PA/league_2PA, f2P= Pos_2P/league_2P, fDRB= Pos_DRB/league_DRB, fAST = Pos_AST/league_AST, 
 fBLK=Pos_BLK/league_BLK, fSTL= Pos_STL/league_STL, f3PA = Pos_3PA/league_3PA, f3P = Pos_3P/league_3P, fPF = Pos_PF/league_PF)
@@ -132,7 +132,7 @@ df1822totals <- df1822 %>% mutate(`T3P` = `3P` * G, `T3PA` = `3PA` * G)
 
 ```
 # Rebounding
-To start off, let's look at  how rebounding -- a skill typically most associated with Centers and Power Forward -- and see how this has changed over time.
+To start off, let's look at  how rebounding -- a skill typically most associated with Centers and Power Forward -- and how this has changed over time.
 
 ```{r, echo=FALSE, figures-side, fig.show="hold", out.width="50%"}
 posaverages %>% 
@@ -166,7 +166,7 @@ fulltotals %>%
   labs(title = "Percentage of Total Rebounds by Position 1980-2022", x='Year', y= "Percentage of total Rebounds")
 
 ```
-
+Interestingly, you can see in this set of graphs that the efensive rebounds
 # Assists
 Assist are skill traditionally associated with back court positions, Point Guard and Shooting Guard. Let's see if assists have become more evenly distributed by position.
 
@@ -188,40 +188,29 @@ fulltotals %>%
 Now lets look at how each position has evolved in regards to three point shooting over the years.
 
 ```{r, echo=FALSE, fig.show="hold", out.width="50%"}
-
+#Add Captions
 threes %>% 
   ggplot(aes(x=year, y=`3P%`, color=Pos)) + 
   geom_line() + 
-  labs(title = "Average Three-Point Percentage 1980-2022 by Position", x='Year', y= "Three Point Percentage")
+  labs(title = "Average Three-Point Percentage 1980-2022 by Position", x='Year', y= "Three Point Percentage",)
 
 threes %>% 
   ggplot(aes(x=year, y=`3PA`, color=Pos)) + 
   geom_line(size=1) + 
-  labs(title = "Average Amount of Three-Point Field Goals Attempted 1980-2022 by Position", x='Year', y= "Average number of Three Point Attempts Per Game")
-
+  labs(title = "Average # of Three-Point Field Goals Made per game 1980-2022 by Position", x='Year', y= "Average number of Three Pointers made Per Game")
 
 threes %>% 
   ggplot(aes(x=year, y=amt_threes_made, color=Pos)) + 
   geom_line() + 
-  labs(x='Year', y= "Ratio of Made Threes to Total Made Field Goals")
- 
-threes %>% 
-  ggplot(aes(x=year, y=amt_threes_attempted, color=Pos)) + 
-  geom_line() + 
-  labs(x='Year', y= "Ratio of Attempted Threes to Total Attempted Field Goals")
-
-fulltotals %>% 
-  ggplot(aes(x=year, y=`f3PA`, color=Pos)) + 
-  geom_line(size=1) + 
-  labs(title = "Percentage of Total 3 Point Attempts Taken by Each Position 1980-2022", x='Year', y= "Percentage of total 3 Point attempts")
+  labs(title= 'Percentage of Made Field Goals Which Were Three Pointers', x='Year', y= "Ratio of Made Threes to Total Made Field Goals")
 
 fulltotals %>% 
   ggplot(aes(x=year, y=`f3P`, color=Pos)) + 
   geom_line(size=1) + 
   labs(title = "Percentage of Total 3 Pointers by Each Position 1980-2022", x='Year', y= "Percentage of total 3 Pointers")
 
-
 ```
+Explanation
 
 # Blocks
 Let`s take a look at blocks now...
@@ -259,28 +248,16 @@ fulltotals %>%
 Since we've already looked at Threes lets take a look at two's as well.
 
 ```{r, echo=FALSE, fig.show="hold", out.width="50%"}
+#possibly change scale
 fulltotals %>% 
   ggplot(aes(x=year, y=`f2P`, color=Pos)) + 
   geom_line(size=1) + 
   labs(title = "Percentage of Total 2-Point Field Goals by Each Position 1980-2022", x='Year', y= "Percentage of total 2 Pointers")
 
-
-fulltotals %>% 
-  ggplot(aes(x=year, y=`f2PA`, color=Pos)) + 
-  geom_line(size=1) + 
-  labs(title = "Percentage of Total 2-Point Field Goal Attempts by Each Position 1980-2022", x='Year', y= "Percentage of total 2 Pointers")
-
-
 posaverages %>% 
   ggplot(aes(x=year, y= `2P`, color=Pos)) + 
   geom_line(size=1) + 
-  labs(title = "Average # of 2-Point Field Goals per Game 1980-2022 by Position", x='Year', y= "Average 2-Point Field Goals Fouls Per Game")
-
-posaverages %>% 
-  ggplot(aes(x=year, y= `2PA`, color=Pos)) + 
-  geom_line(size=1) + 
-  labs(title = "Average # of 2-Point Field Goal Attempts per Game 1980-2022 by Position", x='Year', y= "Average 2-Point Field Goal Attempts Per Game")
-
+  labs(title = "Average # of 2-Point Field Goals per Game 1980-2022 by Position", x='Year', y= "Average 2-Point Field Goals Per Game")
 
 ```
 
